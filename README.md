@@ -111,7 +111,7 @@ https://github.com/edicliuyang/DBiT-seq_FFPE/tree/master/Figure_Processing
 
 
 
-### Downstream analysis
+### Downstream analysis (in Data_visualization folder)
 All downstream analysis were completed with R language. The package used extensively the functions in Seurat v.4.3.0.1, ArchR v1.0.2, ClusterProfiler v4.8.3, Slingshot v2.2.1, FigR v0.1.0. 
 
 Brief descriptions of analysis scripts:
