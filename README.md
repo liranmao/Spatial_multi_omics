@@ -1,4 +1,4 @@
-# Spatial_multi_omics
+# Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues
 
 ### Introduction
 This repository aims to share the raw data processing and visualization codes used in Spatial_multi_omics project.
