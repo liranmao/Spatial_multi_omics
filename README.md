@@ -7,7 +7,7 @@ This repository aims to share the raw data processing and visualization codes us
 ![github_intro](https://github.com/liranmao/Spatial_multi_omics/assets/78578236/2986f184-04c3-4fc2-8166-9e088c83a7cb)
 
 
-### Data processing
+### Preprocessing
  Next Generation Sequencing (NGS) was performed using the Illumina NovaSeq 6000 sequencer (pair-end 150 bp mode).
 #### Spatial_ATAC-seq
 ##### 1.Raw Fastq data
@@ -110,7 +110,7 @@ https://github.com/edicliuyang/DBiT-seq_FFPE/tree/master/Figure_Processing
 
 
 
-### Data visualization
-The data visualization were completed with R language. The package used extensively the functions in Signac V1.6， Seurat V4.0 and ArchR v1.0.2.
+### Downstream analysis
+All downstream analysis were completed with R language. The package used extensively the functions in Signac V1.6， Seurat V4.0 and ArchR v1.0.2.
 
 
