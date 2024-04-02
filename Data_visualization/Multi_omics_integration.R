@@ -296,7 +296,7 @@ for (gene_name in gene_to_look){
 
 
 
-# bivalent (this is for nano68, you should edit the code for each sample)
+# bivalent (this is for nano68, fig3, you should edit the code for each sample)
 plot_one_gene_lineage_all_bi_nor <- function(seurat.wnn.peak.sub, gene){
   final_list <- gene
   final_list <- intersect(rownames(seurat.wnn.peak.sub@assays$gscore_intersect_Spananob68_deep_H3K4me3@data), final_list)
