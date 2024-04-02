@@ -112,13 +112,25 @@ https://github.com/edicliuyang/DBiT-seq_FFPE/tree/master/Figure_Processing
 
 
 ### Downstream analysis (in Data_visualization folder)
-All downstream analysis were completed with R language. The package used extensively the functions in Seurat v.4.3.0.1, ArchR v1.0.2, ClusterProfiler v4.8.3, Slingshot v2.2.1, FigR v0.1.0. 
+All downstream analyses were completed with R language. The package used extensively the functions in Seurat v.4.3.0.1, ArchR v1.0.2, ClusterProfiler v4.8.3, Slingshot v2.2.1, FigR v0.1.0. 
 
 Brief descriptions of analysis scripts:
 
+ArchR.R: Analysis of ATAC/histone modifications data.
 
+RNA.R: Analysis of RNA data
 
+GO.R: GO enrichment analysis for marker genes.
 
+Multi_omics_integration.r and Multi_omics_integration_prepare.r: Multi-omics analysis.
+
+RCTD: Cell-type annotation and deconvolution.
+
+FigR: Gene regulation analysis
+
+Functions:
+
+spatial_data_visualization.R: Visualize spatially resolved data on tissue sections.
 
 
 
