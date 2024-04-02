@@ -106,8 +106,7 @@ Then, Run converttoname.sh to annotate the resulting sample_stdata.tsv.
     convertEnsemblToNames.py --annotation $path_to_annotation_file --output $OUTPUT/${sample}_stdata_names.tsv $tsv_E
 
 ####  Identify useful pixels (pixel on tissue) from microscope image using Matlab
-link：
-https://github.com/edicliuyang/DBiT-seq_FFPE/tree/master/Figure_Processing
+See the files in Image_preprocess under Data_preprocessing folder.
 
 
 
