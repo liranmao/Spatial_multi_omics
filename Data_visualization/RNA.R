@@ -1,3 +1,5 @@
+####### This code is for basic analysis on RNA data
+
 library(ggplot2)
 library(dplyr)
 library(Seurat)
