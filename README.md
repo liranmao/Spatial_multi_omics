@@ -8,7 +8,7 @@ This repository aims to share the raw data processing and visualization codes us
 
 
 ## Data analysis
-### Preprocessing
+### 1. Preprocessing the sequencing data
  Next Generation Sequencing (NGS) was performed using the Illumina NovaSeq 6000 sequencer (paired-end 150 bp mode). 
  
 In the Data_preprocessing folder, directories beginning with Snakemake_* contain the code for preprocessing different modalities. The preprocessing pipeline utilizes raw FASTQ data as input, where Read 1 comprises genomic sequences, and Read 2 contains the spatial barcodes, specifically Barcode A and Barcode B.
@@ -19,15 +19,15 @@ In the Data_preprocessing folder, directories beginning with Snakemake_* contain
 
 
 **Brief descriptions of preprocessing pipeline in Snakefile:**
-##### 1. **Directory and File Setup**
+(1) **Directory and File Setup**
 - Automates the creation of directories for storing raw and processed data per sample.
 - Lists samples dynamically based on the provided raw data directory.
 
-##### 2. **Reads Filtering**
+(2) **Reads Filtering**
 - `filter_primer`: Utilizes `bbduk.sh` to remove primers and specific sequences from the reads.
 - `filter_L1` & `filter_L2`: Further filtering steps target and remove specific linker sequences.
 
-##### 3. **Barcode Processing**
+##### (3) **Barcode Processing**
 - `bc_process`: Extracts and reformat the data. (BC_process.py)
 - `R1_rename`: Renames and reorganizes the processed reads for consistency and further processing.
 
