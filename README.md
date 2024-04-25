@@ -18,7 +18,7 @@ In the Data_preprocessing folder, directories beginning with Snakemake_* contain
     sbatch Snakemake.sh
 
 
-**Brief descriptions of preprocessing pipeline:**
+**Brief descriptions of preprocessing pipeline in Snakefile:**
 ##### 1. **Directory and File Setup**
 - Automates the creation of directories for storing raw and processed data per sample.
 - Lists samples dynamically based on the provided raw data directory.
