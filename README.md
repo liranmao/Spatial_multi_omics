@@ -48,7 +48,10 @@ In the Data_preprocessing folder, directories beginning with Snakemake_* contain
 
 
 
-###  2. Preprocessing the image: identify useful pixels (pixel on tissue) from microscope image using Python
+###  2. Preprocessing the microscope image
+
+**Identify useful pixels (pixel on tissue) from microscope image using Python**
+
 See the files in Image_preprocess under Data_preprocessing folder.
 
 
