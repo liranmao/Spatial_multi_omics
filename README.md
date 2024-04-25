@@ -16,7 +16,7 @@ This repository aims to share the raw data processing and visualization codes us
     sbatch Snakemake.sh
 
 **Brief descriptions of preprocessing pipeline:**
-#### 1. **Directory and File Setup**
+###### 1. **Directory and File Setup**
 - Automates the creation of directories for storing raw and processed data per sample.
 - Lists samples dynamically based on the provided raw data directory.
 
