@@ -133,5 +133,3 @@ spatial_data_visualization.R: Visualize spatially resolved data on tissue sectio
 
 
 
-## Acknowledgements
-
