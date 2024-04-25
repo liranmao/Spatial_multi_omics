@@ -9,11 +9,46 @@ This repository aims to share the raw data processing and visualization codes us
 
 ## Data analysis
 ### Preprocessing
- Next Generation Sequencing (NGS) was performed using the Illumina NovaSeq 6000 sequencer (paired-end 150 bp mode).
+ Next Generation Sequencing (NGS) was performed using the Illumina NovaSeq 6000 sequencer (paired-end 150 bp mode). In Data_preprocessing folder, the folders with the name starting with Snakemake_* is the code for preprocessing different modality. The input for the preprocessing pipeline is raw fastq data with read 1 contains the genome sequences and read 2 contains the spatial Barcode A and Barcode B. 
+
+**The preprocessing pipeline we developed using Snakemake workflow management system is in the Data_preprocessing folder. After putting the input files in the correct directory, to run the pipeline, use the command:**
+
+    sbatch Snakemake.sh
+
+**Brief descriptions of preprocessing pipeline:**
+#### 1. **Directory and File Setup**
+- Automates the creation of directories for storing raw and processed data per sample.
+- Lists samples dynamically based on the provided raw data directory.
+
+#### 2. **Reads Filtering**
+- `filter_primer`: Utilizes `bbduk.sh` to remove primers and specific sequences from the reads.
+- `filter_L1` & `filter_L2`: Further filtering steps target and remove specific linker sequences.
+
+#### 3. **Barcode Processing**
+- `bc_process`: Extracts and processes barcode information from the reads for spatial identification.
+- `R1_rename`: Renames and reorganizes the processed reads for consistency and further processing.
+
+#### 4. **Barcode Tagging and Matching**
+- `taggd`: Corrects barcodes and prepares the data for demultiplexing.
+- `add_BC`: Attaches barcode tags back to the reads, facilitating tracking and analysis.
+
+#### 5. **Adapter Trimming**
+- `adapter_trim`: Trims sequencing adapters from the reads using `trim_galore`, preparing them for alignment.
+
+#### 6. **Sequence Alignment**
+- `bwa_align`: Maps reads to a reference genome with `bwa mem`, followed by sorting and indexing the alignments using `samtools`.
+
+#### 7. **Fragment File Generation**
+- `fragments`: Transforms BAM files into sorted, compressed, and indexed BED files, ready for downstream analysis.
+
+
+
+
+    
+
 #### Spatial_ATAC-seq
 ##### 1.Raw Fastq data
-Read 1: contains the genome sequences
-Read 2: contains the spatial Barcode A and Barcode B
+
 ##### 2. Reformat raw Fastq file to Cell Ranger ATAC format (10x Genomics)
 **Raw read 1 -> New Read 1 + New Read 2**
 - New Read 1: contains the genome sequences
