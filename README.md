@@ -1,4 +1,4 @@
-![image](https://github.com/liranmao/Spatial_multi_omics/assets/78578236/6b5917de-208f-4188-8010-78f557799f94)![image](https://github.com/liranmao/Spatial_multi_omics/assets/78578236/49a32627-7299-44b6-a7a7-e5ef0af615bd)# Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues
+Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues
 
 ## Introduction
 This repository aims to share the raw data processing and visualization codes used in multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues paper.
