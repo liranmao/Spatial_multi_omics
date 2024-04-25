@@ -9,7 +9,7 @@ This repository aims to share the raw data processing and visualization codes us
 
 ## Data analysis
 ### Preprocessing
- Next Generation Sequencing (NGS) was performed using the Illumina NovaSeq 6000 sequencer (paired-end 150 bp mode). In Data_preprocessing folder, the folders with the name starting with Snakemake_* is the code for preprocessing different modality. The input for the preprocessing pipeline is raw fastq data with read 1 contains the genome sequences and read 2 contains the spatial Barcode A and Barcode B. 
+ Next Generation Sequencing (NGS) was performed using the Illumina NovaSeq 6000 sequencer (paired-end 150 bp mode). In the Data_preprocessing folder, directories beginning with Snakemake_* contain the code for preprocessing different modalities. The preprocessing pipeline utilizes raw FASTQ data as input, where Read 1 comprises genomic sequences, and Read 2 contains the spatial barcodes, specifically Barcode A and Barcode B.
 
 **The preprocessing pipeline we developed using Snakemake workflow management system is in the Data_preprocessing folder. After putting the input files in the correct directory, to run the pipeline, use the command:**
 
