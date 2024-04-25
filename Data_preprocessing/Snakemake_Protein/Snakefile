@@ -1,0 +1,147 @@
+import os
+import fnmatch
+
+############################
+# global varibales
+############################
+
+rawData_dir = "/mnt/nas1/Users/Pengfei/Raw_data/2024/0308Spnbprot68/FF"
+processedData_dir = '/mnt/nas1/Users/Pengfei/Processed_data/2023/0308Spnbprot68'
+fastq_ext = '.fq.gz' #fastq file extension
+
+core = 20 # threads to use
+
+bbduk_dir = "/mnt/nas1/Software/bbmap/bbduk.sh"
+whitelist="WHITELIST.csv"
+ref_dir='TAG_LIST.csv'
+############################
+
+samples = os.listdir(rawData_dir)
+#output_tsv = [processedData_dir+'/'+sample+'/'+'output/'+sample+'_stdata_names.tsv' for sample in samples]
+#output_qc = [processedData_dir+'/'+sample+'/'+'output/qc/'+sample+'_stdata_heatmap_genes.pdf' for sample in samples]
+#output_fastqc= [processedData_dir+'/'+sample+'/'+'fastqc/'+sample+'_R1_fastqc.html' for sample in samples]
+
+output_report= [processedData_dir+'/'+sample+'/'+"output/align/run_report.yaml" for sample in samples]
+
+#output_all = output_tsv + output_qc
+
+list_fastq={}
+for sample in samples:
+    list_fastq[sample]=(fnmatch.filter(os.listdir(rawData_dir+'/'+sample), '*1'+fastq_ext)[0].split(".")[0],
+                        fnmatch.filter(os.listdir(rawData_dir+'/'+sample), '*2'+fastq_ext)[0].split(".")[0])
+    
+# generating folders
+
+for sample in samples:
+    
+    #fastqc=processedData_dir+'/'+sample+'/fastqc'
+    output=processedData_dir+'/'+sample+'/output'
+    tmp=output+'/tmp'
+    qc=output+'/qc'
+    log_dir=output+'/log'
+    align_dir=output+'/align'
+    
+    #if not os.path.exists(fastqc):
+    #    os.makedirs(fastqc)
+    if not os.path.exists(output):
+        os.makedirs(output)
+    if not os.path.exists(tmp):
+        os.makedirs(tmp)
+    if not os.path.exists(qc):
+        os.makedirs(qc)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    if not os.path.exists(align_dir):
+        os.makedirs(align_dir)
+
+
+rule all:
+  input:
+    output_report
+    #output_all
+    
+
+rule filter_primer:
+  input:
+    in1 = lambda wildcards: rawData_dir+"/{sample}/"+list_fastq[wildcards.sample][0]+fastq_ext,
+    in2 = lambda wildcards: rawData_dir+"/{sample}/"+list_fastq[wildcards.sample][1]+fastq_ext
+  output:
+    out1 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R1_filtered_primer.fastq.gz",
+    out2 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R2_filtered_primer.fastq.gz"
+  shell:
+    '''
+    {bbduk_dir} \
+    in1={input.in1} \
+    in2={input.in2} \
+    outm1={output.out1} \
+    outm2={output.out2} \
+    k=22 mm=f rcomp=f restrictleft=30 skipr1=t \
+    hdist=2 \
+    stats={processedData_dir}/{wildcards.sample}/output/qc/{wildcards.sample}_stats.primer.txt \
+    threads={core} \
+    literal=CAAGCGTTGGCTTCTCGCATCT
+    '''
+
+rule filter_L1:
+  input:
+    in1 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R1_filtered_primer.fastq.gz",
+    in2 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R2_filtered_primer.fastq.gz"
+  output:
+    out1 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R1_filtered_linker1.fastq.gz",
+    out2 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R2_filtered_linker1.fastq.gz"
+  shell:
+    '''
+    {bbduk_dir} \
+    in1={input.in1} \
+    in2={input.in2} \
+    outm1={output.out1} \
+    outm2={output.out2} \
+    k=30 mm=f rcomp=f restrictleft=108 skipr1=t \
+    hdist=3 \
+    stats={processedData_dir}/{wildcards.sample}/output/qc/{wildcards.sample}_stats.linker1.txt \
+    threads={core} \
+    literal=GTGGCCGATGTTTCGCATCGGCGTACGACT
+    '''
+    
+rule filter_L2:
+  input:
+    in1 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R1_filtered_linker1.fastq.gz",
+    in2 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R2_filtered_linker1.fastq.gz"
+  output:
+    out1 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R1_filtered_linker2.fastq.gz",
+    out2 = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R2_filtered_linker2.fastq.gz"
+  shell:
+    '''
+    {bbduk_dir} \
+    in1={input.in1} \
+    in2={input.in2} \
+    outm1={output.out1} \
+    outm2={output.out2} \
+    k=30 mm=f rcomp=f restrictleft=70 skipr1=t \
+    hdist=3 \
+    stats={processedData_dir}/{wildcards.sample}/output/qc/{wildcards.sample}_stats.linker2.txt \
+    threads={core} \
+    literal=ATCCACGTGCTTGAGAGGCCAGAGCATTCG
+    '''
+    
+rule fq_process:
+  input:
+    processedData_dir + "/{sample}" + "/output/tmp/{sample}_R2_filtered_linker2.fastq.gz"
+  output:
+    processedData_dir + "/{sample}" + "/output/tmp/{sample}_R2_processed.fastq.gz"
+  shell:
+    '''
+    python fastq_process.py --input {input} --output {output}
+    '''
+    
+rule CITE_seq_Count:
+  input:
+    read_BC = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R2_processed.fastq.gz",
+    read_Seq = processedData_dir + "/{sample}" + "/output/tmp/{sample}_R1_filtered_linker2.fastq.gz"
+  output:
+    processedData_dir + "/{sample}" + "/output/align/run_report.yaml"
+  shell:
+    '''
+    CITE-seq-Count -R1 {input.read_BC} -R2 {input.read_Seq} -t {ref_dir} -trim 21 -cbf 1 -cbl 16 -umif 17 -umil 26 \
+    -cells 2500 -wl {whitelist} -T {core} -o {processedData_dir}/{wildcards.sample}/output/align/ 
+    '''

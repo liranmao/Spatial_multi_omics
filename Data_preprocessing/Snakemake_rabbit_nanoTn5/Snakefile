@@ -1,0 +1,230 @@
+import os
+import fnmatch
+
+########################################################
+# global varibales
+# 1. modify global varibales here
+# 2. modify cluster.json
+########################################################
+
+rawData_dir = "/mnt/nas1/Users/Pengfei/Raw_data/2024/0308Spnanob68/FF"
+processedData_dir = '/mnt/nas1/Users/Pengfei/Processed_data/2023/0308Spnanob68_H3K4me3'
+fastq_ext = '.fq.gz' #fastq file extension
+
+cores_filter = 40 # threads to use for filtering
+cores_taggd = 40 # default: 0, yielding number of machine cores - 1
+cores_align = 40 # threads to use for bwa align
+
+bbduk_dir = "/mnt/nas1/Software/bbmap/bbduk.sh"
+ref_dir = "/mnt/nas1/Reference/bwa/genomes/mm10/index/bwa/mm10.fa"
+bc_dir = "./spatial_barcodes.txt"
+
+########################################################
+
+########################################################
+# Do not change codes below
+########################################################
+
+samples = os.listdir(rawData_dir)
+output = [processedData_dir+'/'+sample+'/fragments/'+sample+'.fragments.sort.bed.gz.tbi' for sample in samples]
+
+list_fastq={}
+for sample in samples:
+    list_fastq[sample]=(fnmatch.filter(os.listdir(rawData_dir+'/'+sample), '*1'+fastq_ext)[0].split(".")[0],
+                        fnmatch.filter(os.listdir(rawData_dir+'/'+sample), '*2'+fastq_ext)[0].split(".")[0])
+                        
+# generating folders
+
+for sample in samples:
+    
+    output_dir=processedData_dir+'/'+sample+'/fragments'
+    tmp_data=processedData_dir+'/'+sample+'/tmp_fastq'
+    qc_raw_data=tmp_data+'/filtered/qc_raw_data'
+    #log_dir=output_dir+'/log'
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    if not os.path.exists(tmp_data):
+        os.makedirs(tmp_data)
+    if not os.path.exists(qc_raw_data):
+        os.makedirs(qc_raw_data)
+    #if not os.path.exists(log_dir):
+        #os.makedirs(log_dir)
+
+
+rule all:
+  input:
+    output
+    
+rule filter_primer:
+  input:
+    in1 = lambda wildcards: rawData_dir+"/{sample}/"+list_fastq[wildcards.sample][0]+fastq_ext,
+    in2 = lambda wildcards: rawData_dir+"/{sample}/"+list_fastq[wildcards.sample][1]+fastq_ext
+  output:
+    out1 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_primer_R1.fastq.gz",
+    out2 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_primer_R2.fastq.gz"
+  shell:
+    '''
+    echo "Start reads filtering (primer, linker1, linker2) for {wildcards.sample} ..."
+
+    {bbduk_dir} \
+    in1={input.in1} \
+    in2={input.in2} \
+    outm1={output.out1} \
+    outm2={output.out2} \
+    k=22 mm=f rcomp=f restrictleft=30 skipr1=t \
+    hdist=2 \
+    stats={processedData_dir}/{wildcards.sample}/tmp_fastq/filtered/qc_raw_data/{wildcards.sample}_stats.primer.txt \
+    threads={cores_filter} \
+    literal=CAAGCGTTGGCTTCTCGCATCT
+    '''    
+
+rule filter_L1:
+  input:
+    in1 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_primer_R1.fastq.gz",
+    in2 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_primer_R2.fastq.gz"
+  output:
+    out1 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_linker1_R1.fastq.gz",
+    out2 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_linker1_R2.fastq.gz"
+  shell:
+    '''
+    {bbduk_dir} \
+    in1={input.in1} \
+    in2={input.in2} \
+    outm1={output.out1} \
+    outm2={output.out2} \
+    k=30 mm=f rcomp=f restrictleft=114 skipr1=t \
+    hdist=3 \
+    stats={processedData_dir}/{wildcards.sample}/tmp_fastq/filtered/qc_raw_data/{wildcards.sample}_stats.linker1.txt \
+    threads={cores_filter} \
+    literal=GATGTTTCGCATCGGCGTACGACTCCTATC
+    '''
+    
+rule filter_L2:
+  input:
+    in1 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_linker1_R1.fastq.gz",
+    in2 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_linker1_R2.fastq.gz"
+  output:
+    out1 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_R1.fastq.gz",
+    out2 = processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_R2.fastq.gz"
+  shell:
+    '''
+    {bbduk_dir} \
+    in1={input.in1} \
+    in2={input.in2} \
+    outm1={output.out1} \
+    outm2={output.out2} \
+    k=30 mm=f rcomp=f restrictleft=70 skipr1=t \
+    hdist=3 \
+    stats={processedData_dir}/{wildcards.sample}/tmp_fastq/filtered/qc_raw_data/{wildcards.sample}_stats.linker2.txt \
+    threads={cores_filter} \
+    literal=ATCCACGTGCTTGAGAGGCCAGAGCATTCG
+    '''
+
+rule bc_process:
+  input:
+    processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_R2.fastq.gz"
+  output:
+    out1 = processedData_dir + "/{sample}/tmp_fastq/filtered/{sample}_R2.fastq",
+    out2 = processedData_dir + "/{sample}/tmp_fastq/filtered/{sample}_BC.fastq"
+  shell:
+    '''
+    python BC_process.py --input {input} --output_R1 {output.out1} --output_R2 {output.out2}
+    '''
+    
+rule R1_rename:
+  input:
+    processedData_dir + "/{sample}/tmp_fastq/filtered/qc_raw_data/{sample}_raw_qc_R1.fastq.gz"
+  output:
+    processedData_dir + "/{sample}/tmp_fastq/filtered/{sample}_R1.fastq.gz"
+  shell:
+    '''
+    cp {input} {output}
+    '''
+
+rule taggd:
+  input:
+    processedData_dir + "/{sample}/tmp_fastq/filtered/{sample}_BC.fastq"
+  output:
+    processedData_dir + "/{sample}/tmp_fastq/tag/BC_tagged/{sample}_BC_tagged_results.tsv"
+  shell: # --k The kmer length
+    '''
+    echo "Correct barcodes for {wildcards.sample} ..."
+
+    mkdir -p {processedData_dir}/{wildcards.sample}/tmp_fastq/tag/BC_tagged
+
+    taggd_demultiplex.py --k 5 --subprocesses {cores_taggd} {bc_dir} {input} {processedData_dir}/{wildcards.sample}/tmp_fastq/tag/BC_tagged/{wildcards.sample}_BC_tagged
+    '''
+
+rule add_BC:
+  input:
+    in1 = processedData_dir + "/{sample}/tmp_fastq/filtered/{sample}_R1.fastq.gz",
+    in2 = processedData_dir + "/{sample}/tmp_fastq/filtered/{sample}_R2.fastq",
+    in3 = processedData_dir + "/{sample}/tmp_fastq/tag/BC_tagged/{sample}_BC_tagged_results.tsv"
+  output:
+    out1 = processedData_dir + "/{sample}/tmp_fastq/tag/{sample}_R1_matchedBC.fastq",
+    out2 = processedData_dir + "/{sample}/tmp_fastq/tag/{sample}_R2_matchedBC.fastq"
+  shell:
+    '''
+    echo "Add barcodes to fastq files for {wildcards.sample} ..."
+
+    python add_BC.py --input_R1 {input.in1} --input_R2 {input.in2} --input_list {input.in3} --output_R1 {output.out1} --output_R2 {output.out2}
+    '''
+
+rule adapter_trim:
+  input:
+    in1 = processedData_dir + "/{sample}/tmp_fastq/tag/{sample}_R1_matchedBC.fastq",
+    in2 = processedData_dir + "/{sample}/tmp_fastq/tag/{sample}_R2_matchedBC.fastq"
+  output:
+    out1 = processedData_dir + "/{sample}/tmp_fastq/trim_adapter/{sample}_R1_matchedBC_val_1.fq",
+    out2 = processedData_dir + "/{sample}/tmp_fastq/trim_adapter/{sample}_R2_matchedBC_val_2.fq" 
+  shell:
+    '''
+    echo "Trim adpters for {wildcards.sample} ..."
+
+    mkdir -p {processedData_dir}/{wildcards.sample}/tmp_fastq/trim_adapter
+
+    trim_galore --paired --nextera --stringency 5 --cores 4 -o {processedData_dir}/{wildcards.sample}/tmp_fastq/trim_adapter {input.in1} {input.in2}
+    '''
+
+rule bwa_align:
+  input:
+    in1 = processedData_dir + "/{sample}/tmp_fastq/trim_adapter/{sample}_R1_matchedBC_val_1.fq",
+    in2 = processedData_dir + "/{sample}/tmp_fastq/trim_adapter/{sample}_R2_matchedBC_val_2.fq"
+  output:
+    out1 = processedData_dir + "/{sample}/tmp_fastq/align/{sample}.sort.bam",
+    out2 = processedData_dir + "/{sample}/tmp_fastq/align/{sample}.sort.bam.bai" 
+  shell:
+    '''
+    echo "Start alignment for {wildcards.sample} ..."
+
+    mkdir -p {processedData_dir}/{wildcards.sample}/tmp_fastq/align
+
+    bwa mem -t {cores_align} {ref_dir} {input.in1} {input.in2} > {processedData_dir}/{wildcards.sample}/tmp_fastq/align/{wildcards.sample}.bam
+
+    samtools sort -@ 8 {processedData_dir}/{wildcards.sample}/tmp_fastq/align/{wildcards.sample}.bam -o {output.out1}
+    samtools index -@ 8 {output.out1}
+    '''
+
+rule fragments:
+  input:
+    processedData_dir + "/{sample}/tmp_fastq/align/{sample}.sort.bam"
+  output:
+    processedData_dir + "/{sample}/fragments/{sample}.fragments.sort.bed.gz.tbi"
+  shell:
+    '''
+    echo "Start generating fragments from {input} ..."
+
+    mkdir -p {processedData_dir}/{wildcards.sample}/fragments
+
+    sinto fragments -b {input} -p 8 -f {processedData_dir}/{wildcards.sample}/fragments/{wildcards.sample}.fragments.bed --barcode_regex "[^:]*"
+
+    echo "Start sort, compress, and index fragments ..."
+    sort -k1,1 -k2,2n {processedData_dir}/{wildcards.sample}/fragments/{wildcards.sample}.fragments.bed > {processedData_dir}/{wildcards.sample}/fragments/{wildcards.sample}.fragments.sort.bed
+    
+    echo "Start clean up ..."
+    rm {processedData_dir}/{wildcards.sample}/fragments/{wildcards.sample}.fragments.bed
+
+    bgzip -@ 8 {processedData_dir}/{wildcards.sample}/fragments/{wildcards.sample}.fragments.sort.bed
+    tabix -p bed {processedData_dir}/{wildcards.sample}/fragments/{wildcards.sample}.fragments.sort.bed.gz
+    '''
