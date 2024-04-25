@@ -19,40 +19,40 @@ In the Data_preprocessing folder, directories beginning with Snakemake_* contain
 
 
 **Brief descriptions of preprocessing pipeline in Snakefile:**
-(1) **Directory and File Setup**
+(1) Directory and File Setup
 - Automates the creation of directories for storing raw and processed data per sample.
 - Lists samples dynamically based on the provided raw data directory.
 
-(2) **Reads Filtering**
+(2) Reads Filtering
 - `filter_primer`: Utilizes `bbduk.sh` to remove primers and specific sequences from the reads.
 - `filter_L1` & `filter_L2`: Further filtering steps target and remove specific linker sequences.
 
-##### (3) **Barcode Processing**
+(3) Barcode Processing
 - `bc_process`: Extracts and reformat the data. (BC_process.py)
 - `R1_rename`: Renames and reorganizes the processed reads for consistency and further processing.
 
-##### 4. **Barcode Tagging and Matching**
+(4) Barcode Tagging and Matching
 - `taggd`: Corrects barcodes and prepares the data for demultiplexing.
 - `add_BC`: Integrat barcode information into sequencing reads based on a pre-generated list of barcodes and their matches to specific reads. (add_BC.py)
 
-##### 5. **Adapter Trimming**
+(5) Adapter Trimming
 - `adapter_trim`: Trims sequencing adapters from the reads using `trim_galore`, preparing them for alignment.
 
-##### 6. **Sequence Alignment**
+(6) Sequence Alignment
 - `bwa_align`: Maps reads to a reference genome with `bwa mem`, followed by sorting and indexing the alignments using `samtools`.
 
-##### 7. **Fragment File Generation**
+(7) Fragment File Generation
 - `fragments`: Transforms BAM files into sorted, compressed, and indexed BED files, ready for downstream analysis.
 
 
 
 
-####  Identify useful pixels (pixel on tissue) from microscope image using Python
+###  2. Preprocessing the image: identify useful pixels (pixel on tissue) from microscope image using Python
 See the files in Image_preprocess under Data_preprocessing folder.
 
 
 
-### Downstream analysis
+### 3. Downstream analysis
 All downstream analyses were completed with R language. The package used extensively the functions in Seurat v.4.3.0.1, ArchR v1.0.2, ClusterProfiler v4.8.3, Slingshot v2.2.1, FigR v0.1.0. 
 
 **Brief descriptions of analysis scripts:**
