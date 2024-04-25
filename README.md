@@ -9,11 +9,11 @@ This repository aims to share the raw data processing and visualization codes us
 
 ## Data analysis
 ### Preprocessing
- Next Generation Sequencing (NGS) was performed using the Illumina NovaSeq 6000 sequencer (pair-end 150 bp mode).
+ Next Generation Sequencing (NGS) was performed using the Illumina NovaSeq 6000 sequencer (paired-end 150 bp mode).
 #### Spatial_ATAC-seq
 ##### 1.Raw Fastq data
-Read 1: contains the spatial Barcode A and Barcode B
-Read 2: contains the genome sequences
+Read 1: contains the genome sequences
+Read 2: contains the spatial Barcode A and Barcode B
 ##### 2. Reformat raw Fastq file to Cell Ranger ATAC format (10x Genomics)
 **Raw read 1 -> New Read 1 + New Read 2**
 - New Read 1: contains the genome sequences
