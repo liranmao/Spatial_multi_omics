@@ -349,3 +349,175 @@ plot_one_gene_lineage_all_bi_nor <- function(seurat.wnn.peak.sub, gene){
 plot_one_gene_lineage_all_bi_nor(seurat.wnn.peak.sub.clean, 'Sox2')
 
 
+## Quantify the relationship between omics
+# H3K27me3
+projHeme1 <- loadArchRProject(path ='/mnt/HDD1/Users/liran/nano_review/38nanobody_deep/Spnanob38_deep_H3K27me3/Save-inTissue-Spananob38_deep_H3K27me3', force = FALSE, showLogo = TRUE)
+
+projHeme1 <- addGeneScoreMatrix(
+  input = projHeme1,
+  genes = getGenes(projHeme1),
+  geneModel = "exp(-abs(x)/5000) + exp(-1)",
+  matrixName = "GeneScoreMatrix",
+  extendUpstream = c(1000, 1e+05),
+  extendDownstream = c(1000, 1e+05),
+  geneUpstream = 40,
+  geneDownstream = 40,
+  useGeneBoundaries = TRUE,
+  useTSS = TRUE,
+  extendTSS = FALSE,
+  tileSize = 5000,
+  ceiling = 4,
+  geneScaleFactor = 5,
+  scaleTo = 10000,
+  excludeChr = c("chrY", "chrM"),
+  blacklist = getBlacklist(projHeme1),
+  threads = getArchRThreads(),
+  parallelParam = NULL,
+  subThreading = TRUE,
+  force = TRUE,
+  logFile = createLogFile("addGeneScoreMatrix")
+)
+
+
+projHeme1 <- addImputeWeights(projHeme1)
+
+gene_score_mat <- getMatrixFromProject(
+  ArchRProj = projHeme1,
+  useMatrix = "GeneScoreMatrix",
+  useSeqnames = NULL,
+  verbose = TRUE,
+  binarize = FALSE,
+  threads = getArchRThreads(),
+  logFile = createLogFile("getMatrixFromProject")
+)
+
+gene_score <- getGeneScore_ArchR(ArchRProj = projHeme1, name = rowData(gene_score_mat)$name, imputeWeights = getImputeWeights(projHeme1))
+
+
+# Convert the data.frame to a matrix
+new_data_matrix <- as.matrix(gene_score)
+
+# Create a new assay from the matrix
+new_assay <- CreateAssayObject(counts = new_data_matrix)
+
+# Add the new assay to the Seurat object
+RNA[["gene_score_me3_TSS"]] <- new_assay
+
+
+# H3K27ac
+projHeme1 <- loadArchRProject(path ='/mnt/HDD1/Users/liran/nano_review/38nanobody_deep/Spnanob38_deep_H3K27ac/Save-inTissue-Spananob38_deep_H3K27ac', force = FALSE, showLogo = TRUE)
+
+projHeme1 <- addGeneScoreMatrix(
+  input = projHeme1,
+  genes = getGenes(projHeme1),
+  geneModel = "exp(-abs(x)/5000) + exp(-1)",
+  matrixName = "GeneScoreMatrix",
+  extendUpstream = c(1000, 1e+05),
+  extendDownstream = c(1000, 1e+05),
+  geneUpstream = 40,
+  geneDownstream = 40,
+  useGeneBoundaries = TRUE,
+  useTSS = TRUE,
+  extendTSS = FALSE,
+  tileSize = 5000,
+  ceiling = 4,
+  geneScaleFactor = 5,
+  scaleTo = 10000,
+  excludeChr = c("chrY", "chrM"),
+  blacklist = getBlacklist(projHeme1),
+  threads = getArchRThreads(),
+  parallelParam = NULL,
+  subThreading = TRUE,
+  force = TRUE,
+  logFile = createLogFile("addGeneScoreMatrix")
+)
+
+
+projHeme1 <- addImputeWeights(projHeme1)
+gene_score_mat <- getMatrixFromProject(
+  ArchRProj = projHeme1,
+  useMatrix = "GeneScoreMatrix",
+  useSeqnames = NULL,
+  verbose = TRUE,
+  binarize = FALSE,
+  threads = getArchRThreads(),
+  logFile = createLogFile("getMatrixFromProject")
+)
+
+gene_score <- getGeneScore_ArchR(ArchRProj = projHeme1, name = rowData(gene_score_mat)$name, imputeWeights = getImputeWeights(projHeme1))
+
+# Convert the data.frame to a matrix
+new_data_matrix <- as.matrix(gene_score)
+
+# Create a new assay from the matrix
+new_assay <- CreateAssayObject(counts = new_data_matrix)
+
+# Add the new assay to the Seurat object
+RNA[["gene_score_ac_TSS"]] <- new_assay
+subset_RNA <- subset(RNA, subset = sub.cluster2 %in% c('6_0', '6_1'))
+
+
+DefaultAssay(subset_RNA) <- 'Spatial'
+gene <- "Igfbpl1"
+pd <- plot_density(subset_RNA, gene, reduction = 'umap')
+pd_data <- pd$data
+pd_data <- pd_data[, c(3), drop=FALSE]
+all(Cells(subset_RNA) == row.names(pd_data))
+subset_RNA <- AddMetaData(object = subset_RNA, metadata = pd_data)
+# Plot 1: RNA vs. H3K27ac (TSS)
+spatial_counts <- subset_RNA$feature
+ac_TSS_counts <- subset_RNA@assays$gene_score_ac_TSS@counts['Igfbpl1',]
+
+# Calculate the pearson correlation
+pearson_cor <- cor(spatial_counts, ac_TSS_counts, method = "pearson")
+
+# Create a data frame for ggplot
+df_ac <- data.frame(Spatial_Counts = spatial_counts, H3K27ac_Counts = ac_TSS_counts)
+
+# Generate the ggplot
+pdf('dot_plot_ac_TSS_with_RNA_density_pearson_cor.pdf', width = 5, height = 5)
+ggplot(df_ac, aes(x = Spatial_Counts, y = H3K27ac_Counts)) +
+  geom_point(color = "#2c7bb6", size = 2, alpha = 0.6) +  # Use a colorblind-friendly palette
+  geom_smooth(method = "lm", color = "#d7191c", se = FALSE, linetype = "dashed", size = 1) +  # Dashed regression line
+  labs(title = "Igfbpl1 Expression vs. H3K27ac (TSS)",
+       x = "Gene Expression (RNA)",
+       y = "H3K27ac (TSS) Gene Score") +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    panel.grid.major = element_line(size = 0.5),
+    panel.grid.minor = element_blank()
+  ) +
+  annotate("text", x = Inf, y = Inf, label = paste("Pearson Correlation:", round(pearson_cor, 4)),
+           hjust = 1.2, vjust = 2, size = 4.5, color = "black")
+
+dev.off()
+
+# Plot 2: RNA vs. H3K27me3 (TSS)
+spatial_counts <- subset_RNA$feature
+me3_TSS_counts <- subset_RNA@assays$gene_score_me3_TSS@counts['Igfbpl1',]
+
+# Calculate the Spearman correlation
+pearson_cor <- cor(spatial_counts, me3_TSS_counts, method = "pearson")
+
+# Create a data frame for ggplot
+df_me3 <- data.frame(Spatial_Counts = spatial_counts, H3K27me3_Counts = me3_TSS_counts)
+
+# Generate the ggplot
+pdf('dot_plot_me3_TSS_with_RNA_density_pearson_cor.pdf', width = 5, height = 5)
+ggplot(df_me3, aes(x = Spatial_Counts, y = H3K27me3_Counts)) +
+  geom_point(color = "#2c7bb6", size = 2, alpha = 0.6) +  # Use a colorblind-friendly palette
+  geom_smooth(method = "lm", color = "#d7191c", se = FALSE, linetype = "dashed", size = 1) +  # Dashed regression line
+  labs(title = "Igfbpl1 Expression vs. H3K27me3 (TSS)",
+       x = "Gene Expression (RNA)",
+       y = "H3K27me3 (TSS) Gene Score") +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    panel.grid.major = element_line(size = 0.5),
+    panel.grid.minor = element_blank()
+  ) +
+  annotate("text", x = Inf, y = Inf, label = paste("Pearson Correlation:", round(pearson_cor, 4)),
+           hjust = 1.2, vjust = 2, size = 4.5, color = "black")
+
+dev.off()
