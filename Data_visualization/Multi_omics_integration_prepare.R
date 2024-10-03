@@ -10,7 +10,8 @@ outputname <-'Spananob32_deep_combine'
 seurat.rna <- readRDS(file = "/mnt/d/Users/Liran/32nanobody/Spnanob32_RNA/seurat.rna.rds")
 seurat.wnn.peak <- seurat.rna
 
-# add the peak matrix and gene score matrix
+## add the peak matrix and gene score matrix
+# peak matrix
 for (i in 1:3){
   samplepath <- samplepath_list[i]
   modality <- modalitylist[i]
@@ -49,6 +50,7 @@ for (i in 1:3){
   seurat.wnn.peak[[paste0('peaks_',modality)]] <- adt_assay
 }
 
+# gene score matrix
 # Do intersection with RNA and add gene score 
 gene_rna <- rownames(seurat.wnn.peak.rna@assays$Spatial)
 
