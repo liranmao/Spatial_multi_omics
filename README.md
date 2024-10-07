@@ -58,7 +58,7 @@ See the files in Image_preprocess under Data_preprocessing folder.
 
 
 ### 3. Downstream analysis
-All downstream analyses were completed with R language. The package used extensively the functions in Seurat v.4.3.0.1, ArchR v1.0.2, ClusterProfiler v4.8.3, Slingshot v2.2.1, FigR v0.1.0. 
+All downstream analyses were completed with R language. The package used extensively the functions in Seurat v.4.3.0.1, ArchR v1.0.2, ClusterProfiler v4.8.3, Slingshot v2.2.1, FigR v0.1.0. To ensure reproducibility, we have provided a comprehensive tutorial demonstrating the joint analysis of multiple modalities and data visualization. You can access the tutorial here: [SpatialMuxSeq vignette](https://rpubs.com/LiranM/SpatialMuxSeq) or in Fig1_joint_analysis.Rmd. The data needed for it can be found here. 
 
 **Brief descriptions of analysis scripts:**
 
