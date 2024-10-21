@@ -50,7 +50,7 @@ for (i in 1:3){
   seurat.wnn.peak[[paste0('peaks_',modality)]] <- adt_assay
 }
 
-# gene score matrix
+# gene score matrix, this is for visualization, not integration. 
 # Do intersection with RNA and add gene score 
 gene_rna <- rownames(seurat.wnn.peak.rna@assays$Spatial)
 
