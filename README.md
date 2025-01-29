@@ -1,5 +1,8 @@
 # Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues
 
+## Notice of data availability
+On our GEO repository, there is one file GSM8189707_ME13_50um_3_RNA.tar.gz that have been uploaded incorrectly. We are trying to update through GEO and it is still under process. You can also find this file ![here](https://figshare.com/articles/dataset/ME13_50um_3_RNA_tar/28304000?file=52005104).
+
 ## Introduction
 This repository aims to share the raw data processing and visualization code used in the **"Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues"** paper. It is now published on Nature Methods ![Multiplexed spatial mapping of chromatin features, transcriptome and proteins in tissues
 ](https://www.nature.com/articles/s41592-024-02576-0)
