@@ -1,7 +1,8 @@
 # Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues
 
 ## Introduction
-This repository aims to share the raw data processing and visualization code used in the **"Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues"** paper.
+This repository aims to share the raw data processing and visualization code used in the **"Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues"** paper. It is now published on Nature Methods ![Multiplexed spatial mapping of chromatin features, transcriptome and proteins in tissues
+](https://www.nature.com/articles/s41592-024-02576-0)
 
 
 
