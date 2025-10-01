@@ -1,6 +1,6 @@
 # Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues
 ## Update on 10/01/2025
-Uploaded the processed h5ad data for the paper into figshare(DOI: [10.6084/m9.figshare.30258697.v1](https://doi.org/10.6084/m9.figshare.30258697.v1)).  
+Uploaded the processed h5ad and seurat data for the paper into figshare(DOI: [10.6084/m9.figshare.30258697.v1](https://doi.org/10.6084/m9.figshare.30258697.v1)).  
 
 ## Introduction
 This repository aims to share the raw data processing and visualization code used in the **"Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues"** paper. It is now published on Nature Methods [Multiplexed spatial mapping of chromatin features, transcriptome and proteins in tissues
