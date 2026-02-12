@@ -10,7 +10,7 @@ library(dplyr)
 ########## Setup paths
 base_dir <-   # <-- CHANGE THIS: where your sample folders are
 output_dir <-          # <-- CHANGE THIS: where to save results
-script_dir <- '/home/liran/processed_data/Users/Liran/Processed_data/2025/02_nano_review/17nanobody_deep/Spnanob17_h3k27me3_deep/scripts'        # <-- CHANGE THIS: where your helper scripts are
+script_dir <-   # <-- CHANGE THIS: where your helper scripts are
 
 source(file.path(script_dir, 'getGeneScore_ArchR.R'))
 source(file.path(script_dir, 'SpatialPlot_new.R'))
