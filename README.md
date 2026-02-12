@@ -3,9 +3,10 @@
 ## Update on 02/12/2026
 Uploaded the integrated pipeline to get gene score(Data_visualization/gene_score_generation_full_pipeline_for_epi.R). Easy for loading the output to python. 
 
+Uploaded the processed h5ad (fig3) into figshare(DOI: [10.6084/m9.figshare.30258697.v1](https://doi.org/10.6084/m9.figshare.30258697.v1)). 
 
 ## Update on 10/01/2025
-Uploaded the processed h5ad and seurat data for the paper into figshare(DOI: [10.6084/m9.figshare.30258697.v1](https://doi.org/10.6084/m9.figshare.30258697.v1)).  
+Uploaded the processed h5ad and seurat data (fig1-2) for the paper into figshare(DOI: [10.6084/m9.figshare.30258697.v1](https://doi.org/10.6084/m9.figshare.30258697.v1)).  
 
 ## Introduction
 This repository aims to share the raw data processing and visualization code used in the **"Multiplexed spatial mapping of chromatin features, transcriptome, and proteins in tissues"** paper. It is now published on Nature Methods [Multiplexed spatial mapping of chromatin features, transcriptome and proteins in tissues
